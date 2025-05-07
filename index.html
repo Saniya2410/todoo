@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TO DOO</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: rgb(254, 245, 231);
+    }
+    .app-heading {
+      text-align: center;
+      color: rgb(250, 134, 52);
+    }
+    .add-task-container {
+      background-color: black;
+      padding: 20px;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+    }
+    .task-input {
+      font-size: 24px;
+      margin: 0 10px;
+    }
+    .btn-add {
+      font-size: 20px;
+      margin: 0 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+      background-color: orange;
+      border: none;
+      color: white;
+    }
+    .priority-select {
+      font-size: 20px;
+      margin: 0 10px;
+    }
+    @media (max-width: 768px) {
+      .add-task-container {
+        padding: 10px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .task-input,
+      .btn-add,
+      .priority-select {
+        font-size: 16px;
+        margin-bottom: 20px;
+        width: 300px;
+      }
+      .priority-select {
+        padding: 2px 4px;
+      }
+    }
+    .task-card {
+      border: 1px solid black;
+      margin: 10px;
+      padding: 10px;
+      background-color: white;
+      border-radius: 10px;
+      position: relative;
+    }
+    .task-card-title {
+      font-size: 20px;
+      margin: 0;
+    }
+    .task-card-priority {
+      position: absolute;
+      right: 40px;
+      top: 10px;
+      background-color: orange;
+      width: 80px;
+      text-align: center;
+      border-radius: 20px;
+      color: white;
+      padding: 2px 5px;
+    }
+    .cross-icon {
+      height: 20px;
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="app-heading">ToDO App</h1>
+  <div class="todo-List" id="todo-List"></div>
+
+  <div class="add-task-container">
+    <input type="text" id="task" class="task-input" placeholder="Enter a task"/>
+    <select id="priority" class="priority-select">
+      <option value="high">High</option>
+      <option value="medium" selected>Medium</option>
+      <option value="low">Low</option>
+    </select>
+    <button onclick="addTask()" class="btn-add">Add Task</button>
+  </div>
+
+  <script>
+    let tasks = [];
+
+    const savedTasks = localStorage.getItem("tasks");
+    if (savedTasks) {
+      tasks = JSON.parse(savedTasks);
+    }
+
+    function renderToDoList(taskList) {
+      const todoListElement = document.getElementById("todo-List");
+      todoListElement.innerHTML = ""; 
+
+      for (let i = 0; i < taskList.length; i++) {
+        const taskObj = taskList[i];
+
+        todoListElement.innerHTML += `
+          <div class="task-card">
+            <h3 class="task-card-title">${taskObj.task}</h3>
+            <span class="task-card-priority">${taskObj.priority}</span>
+            <img src="remove.png" onclick="removeTask(${i})" class="cross-icon"/>
+          </div>
+        `;
+      }
+    }
+
+    function addTask() {
+      const inputTaskElement = document.getElementById("task");
+      const inputPriorityElement = document.getElementById("priority");
+
+      const taskText = inputTaskElement.value.trim();
+      if (taskText === "") {
+        alert("Please enter a task.");
+        return;
+      }
+
+      const newTask = {
+        task: taskText,
+        priority: inputPriorityElement.value || "medium"
+      };
+
+      tasks.unshift(newTask);
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+      inputTaskElement.value = "";
+      renderToDoList(tasks);
+    }
+
+    function removeTask(index) {
+      tasks.splice(index, 1);
+      localStorage.setItem("tasks", JSON.stringify(tasks)); 
+      renderToDoList(tasks);
+    }
+
+    renderToDoList(tasks);
+  </script>
+</body>
+</html>
